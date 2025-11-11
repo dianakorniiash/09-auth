@@ -3,7 +3,7 @@ import type { Note } from "../../types/note";
 import css from "./NoteList.module.css";
 
 import { useId } from "react";
-import { deleteNote } from "@/lib/api";
+import { deleteNote } from "@/lib/api/api";
 import Link from "next/link";
 interface NoteListProps {
   notes: Note[];
