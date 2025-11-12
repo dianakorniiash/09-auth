@@ -6,6 +6,7 @@ import { IMG_URL, SITE_URL } from "@/lib/constants";
 import { Metadata } from "next";
 import { getMe } from "@/lib/api/serverApi";
 
+
 export const metadata: Metadata = {
   title: "User Profile | NoteHub",
   description: "View and manage your NoteHub profile. Update personal details, view account information, and manage your notes in one place.",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
     title: "User Profile | NoteHub",
     description:
       "Manage your NoteHub account settings and profile information. Stay organized and productive with NoteHub.",
-    url: SITE_URL,
+    url: SITE_URL+"/profile",
 
     images: [
       {
@@ -27,8 +28,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Profile() {
-  const data = await getMe();
-
+  const user = await getMe();
 
   return (
     <main className={css.mainContent}>
@@ -40,17 +40,19 @@ export default async function Profile() {
           </Link>
         </div>
         <div className={css.avatarWrapper}>
-          <Image
-            src={data.avatar}
-            alt="User Avatar"
-            width={120}
-            height={120}
-            className={css.avatar}
-          />
+          {user.avatar && (
+            <Image
+              src={user.avatar}
+              alt="User Avatar"
+              width={120}
+              height={120}
+              className={css.avatar}
+            />
+          )}
         </div>
         <div className={css.profileInfo}>
-          <p>Username: {data.username}</p>
-          <p>Email: {data.email}</p>
+          <p>Username: {user?.username}</p>
+          <p>Email: {user?.email}</p>
         </div>
       </div>
     </main>

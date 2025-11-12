@@ -4,9 +4,10 @@ import "./globals.css";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
-import { Roboto } from 'next/font/google';
+import { Roboto } from "next/font/google";
 import { IMG_URL, SITE_URL } from "@/lib/constants";
 import AuthProvider from "@/components/AuthProvider/AuthProvider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,10 +18,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['500', "600", '700'],
-  variable: '--font-roboto',
-  display: 'swap',
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-roboto",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -53,12 +54,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable}`}
+      >
         <TanStackProvider>
           <AuthProvider>
-          <Header />
-          {children}
-          {modal}
+            <Header />
+            {children}
+            {modal}
             <Footer />
           </AuthProvider>
         </TanStackProvider>

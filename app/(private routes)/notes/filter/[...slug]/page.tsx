@@ -4,9 +4,10 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import NotesClient from "./Notes.client";
-import { fetchNotes } from "@/lib/api/api";
+
 import { Metadata } from "next";
 import { IMG_URL, SITE_URL } from "@/lib/constants";
+import { fetchNotes } from "@/lib/api/serverApi";
 
 
 
