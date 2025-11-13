@@ -5,20 +5,22 @@ import css from "./EditProfilePage.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
 import { isAxiosError } from "axios";
 import { User } from "@/types/user";
+import { useAuthStore } from "@/lib/store/authStore";
 
 export default function EditProfile() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserLocal] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const setAuthUser = useAuthStore((s) => s.setUser);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const data = await getMe();
-        if (data) {
-          setUser(data);
-        }
+        if (data) setUserLocal(data);
       } catch (error) {
         console.error("Failed to fetch user:", error);
       }
@@ -26,50 +28,60 @@ export default function EditProfile() {
     fetchUser();
   }, []);
 
-
   const handleCancel = () => {
     router.push("/profile");
   };
-  const [error, setError] = useState<string | null>(null);
+
   const handleSubmit = async (formData: FormData) => {
-
     try {
-      const username = formData.get("username") as string;
+      const username = (formData.get("username") as string) || "";
+      if (!username.trim()) {
+        setError("Username cannot be empty");
+        return;
+      }
 
-      if (user?.email) {
-        console.log(username, user.email);
+      if (!user?.email) {
+        setError("User email missing");
+        return;
+      }
 
-        await updateProfile({ email: user?.email, username: username });
+      const updated = await updateProfile({
+        email: user.email,
+        username,
+      });
 
- 
 
+      if (updated && typeof updated === "object") {
+        setAuthUser(updated as User);
+      } else {
+        setAuthUser({ ...user, username });
+      }
+
+      setUserLocal((prev) => (prev ? { ...prev, username } : prev));
 
       router.push("/profile");
-}
-     
-    } catch (error) {
-      if (isAxiosError(error) && error.response) {
-        setError(error.response.data.message);
+    } catch (err) {
+      if (isAxiosError(err) && err.response) {
+        const msg =
+          (err.response.data && (err.response.data.message ?? err.response.data.error)) ||
+          "Update failed";
+        setError(String(msg));
       } else {
         setError("An unexpected error occurred");
       }
     }
+  };
 
-   
+  if (!user) return <p>Loading...</p>;
 
-
-
-      
-    
-    
-  }
   return (
     <main className={css.mainContent}>
       <div className={css.profileCard}>
         <h1 className={css.formTitle}>Edit Profile</h1>
-        {user?.avatar && (
+
+        {user.avatar && (
           <Image
-            src={user?.avatar}
+            src={user.avatar}
             alt="User Avatar"
             width={120}
             height={120}
@@ -85,11 +97,13 @@ export default function EditProfile() {
               id="username"
               type="text"
               className={css.input}
-              defaultValue={user?.username}
+              defaultValue={user.username}
             />
           </div>
 
-          <p>Email: { user?.email}</p>
+          <p>Email: {user.email}</p>
+
+          {error && <p className={css.error}>{error}</p>}
 
           <div className={css.actions}>
             <button type="submit" className={css.saveButton}>
